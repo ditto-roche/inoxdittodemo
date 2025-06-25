@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sample" ng-controller="eoo">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - INOX NVOCC Portal</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
+  <script src="scripts.js"></script>
+  <script src="universal/time_utils.js"></script>
+
+  <!-- Boxicons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+
+    .split-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      /* Optional: limits total width */
+      margin: 40px auto 50px;
+      gap: 20px;
+      /* space between left and right */
+      padding: 0 10px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      /* prevents scrolling */
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff4d4dfb 0%, #ad0000 100%);
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header with marquee and menu */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    marquee {
+      flex: 1;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #ad0000;
+      user-select: none;
+    }
+
+    .popup-menu-container {
+      position: relative;
+    }
+
+    .menu-btn {
+      background-color: #ad0000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      background-color: #6c0000;
+    }
+
+    .popup-menu {
+      position: absolute;
+      right: 0;
+      top: 110%;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+      min-width: 150px;
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .popup-menu.show {
+      display: flex;
+    }
+
+    .popup-menu a {
+      padding: 12px 20px;
+      text-decoration: none;
+      color: #ad0000;
+      font-weight: 600;
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.2s ease;
+    }
+
+    .popup-menu a:last-child {
+      border-bottom: none;
+    }
+
+    .popup-menu a:hover {
+      background-color: #ad0000;
+      color: white;
+    }
+
+    /* Time and Date */
+    .time-container {
+      text-align: center;
+      margin: 0 0 0 0;
+      color: white;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .time-container h2 {
+      font-size: 4rem;
+      margin: 0;
+      font-weight: 700;
+      font-family: 'Cambria', serif;
+    }
+
+    .time-container h3 {
+      font-size: 1.8rem;
+      font-weight: 500;
+      margin: 10px 0 0 0;
+      font-family: 'Cambria', serif;
+    }
+
+    /* Background slider */
+    .slider-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.6);
+      z-index: -1;
+      transition: background-image 1s ease-in-out;
+    }
+
+    .left-side,
+    .login-container {
+      flex: 1;
+      margin: 0 auto;
+      /* remove bottom margin */
+      max-height: 100%;
+      overflow: auto;
+    }
+
+    .login-container {
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.95);
+      margin: 0 auto 50px;
+      padding: 20px 20px;
+      border-radius: 12px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-container:hover {
+      transform: scale(1.03);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .login-container h1 {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      color: #ad0000;
+      font-family: 'Cambria', serif;
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #ad0000;
+      margin-bottom: 6px;
+      display: block;
+      font-family: 'Cambria', serif;
+    }
+
+    select,
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ad0000;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: border-color 0.3s ease;
+    }
+
+    select:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #ff0000;
+      box-shadow: 0 0 6px #ff0000;
+    }
+
+    /* Error message */
+    #error-label {
+      color: #cc0000;
+      font-weight: 600;
+      text-align: center;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      min-height: 24px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .left-side p {
+      color: white;
+      font-size: 1.8rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 700;
+      line-height: 1.4;
+      margin: 0;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .left-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      padding: 20px;
+    }
+
+
+    button[type="submit"] {
+      background-color: #ad0000;
+      color: white;
+      font-size: 18px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #6c0000;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .login-container {
+        margin: 20px 15px 50px;
+        padding: 30px 20px;
+      }
+
+      .time-container h2 {
+        font-size: 3rem;
+      }
+
+      .time-container h3 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <marquee behavior="scroll" direction="left" scrollamount="5" aria-label="Welcome message">
+      WELCOME TO THE INOX NVOCC PORTAL
+    </marquee>
+
+    <div class="popup-menu-container">
+      <button class="menu-btn" id="menuBtn" aria-haspopup="true" aria-expanded="false">☰ Menu</button>
+      <nav id="popupMenu" class="popup-menu" role="menu" aria-label="Main menu">
+        <a href="https://mail.google.com/mail/?view=cm&to=dittoroche@gmail.com" target="_blank"
+          role="menuitem">CONTACT</a>
+        <a href="https://www.inoxshipping.com/" target="_blank" role="menuitem">ABOUT</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="slider-background" ng-style="{'background-image': 'url(' + images[currentIndex] + ')'}"></div>
+
+  <section class="time-container" aria-live="polite">
+    <h2 id="time">12:00:00</h2>
+    <h3 id="date">Loading date...</h3>
+  </section>
+
+  <main>
+    <section class="split-container">
+      <div class="left-side">
+        <p>
+          Logistics.<br>
+          Technology.<br>
+          Dominance.<br>
+          Welcome to INOX.
+        </p>
+      </div>
+
+      <section class="login-container" aria-label="Login form">
+        <h1>LOGIN</h1>
+        <form ng-submit="login()" novalidate>
+          <label for="role">ROLE</label>
+          <select name="ROLE" id="role" required aria-required="true" ng-model="credentials.ROLE">
+            <option value="" disabled selected>Select role</option>
+            <option value="admin">ADMIN</option>
+            <option value="agent">AGENT</option>
+            <option value="customer">CUSTOMER</option>
+          </select>
+          <label for="username">USERNAME</label>
+          <input type="text" id="username" name="USERNAME" required aria-required="true" autocomplete="username"
+            ng-model="credentials.USERNAME" />
+          <label for="password">PASSWORD</label>
+          <input type="password" id="password" name="PASSWORD" required aria-required="true"
+            autocomplete="current-password" ng-model="credentials.PASSWORD" />
+          <div id="error-label" role="alert" aria-live="assertive"></div>
+          <button type="submit">LOGIN</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+
+  <script>
+    // Popup menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const popupMenu = document.getElementById('popupMenu');
+
+    menuBtn.addEventListener('click', () => {
+      const expanded = menuBtn.getAttribute('aria-expanded') === 'true' || false;
+      menuBtn.setAttribute('aria-expanded', !expanded);
+      popupMenu.classList.toggle('show');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!menuBtn.contains(e.target) && !popupMenu.contains(e.target)) {
+        popupMenu.classList.remove('show');
+        menuBtn.setAttribute('aria-expanded', false);
+      }
+    });
+
+    // Show error message if exists in URL params
+    const params = new URLSearchParams(window.location.search);
+    const errorLabel = document.getElementById('error-label');
+
+    if (params.has('error') && errorLabel) {
+      const errorType = params.get('error');
+
+      if (errorType === 'inactive') {
+        errorLabel.textContent = 'You are no longer an active user.';
+      } else {
+        errorLabel.textContent = 'Invalid username, password, or role.';
+      }
+
+      errorLabel.style.color = 'red';
+    };
+  </script>
+</body>
+
+</html>
